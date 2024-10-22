@@ -1,16 +1,10 @@
-# edu_sync
+# EduSync
 
-A new Flutter project.
+EduSync is an educational management app that aims to simplify classroom activities and improve communication between teachers and students. Drawing from concepts in *The Pragmatic Programmer*, the app focuses on keeping things simple, adaptable, and easy to maintain. Key features include:
 
-## Getting Started
+- **Timetable with Notifications**: Automatic reminders for students based on their class schedules.
+- **Attendance Tracking**: A straightforward way for teachers to record and monitor attendance.
+- **Events List**: A section where teachers can post upcoming school or class events for students to see.
+- **Updates (Chat Feature)**: A messaging system inspired by WhatsApp, where only teachers can send important updates to the class.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Built with *The Pragmatic Programmer* principles in mind, EduSync focuses on practicality and flexibility in development.
