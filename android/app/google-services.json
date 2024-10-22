@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "760393724374",
+    "project_id": "loreto-847ab",
+    "storage_bucket": "loreto-847ab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760393724374:android:036e698b7f87e15d3ef477",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsPXUJdHFphlERPPhxACfhZNarnbWcrJs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760393724374:android:fda5a72c75f5fb2e3ef477",
+        "android_client_info": {
+          "package_name": "com.example.edu_sync"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsPXUJdHFphlERPPhxACfhZNarnbWcrJs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760393724374:android:71e68564edf884b43ef477",
+        "android_client_info": {
+          "package_name": "com.example.smartclassmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsPXUJdHFphlERPPhxACfhZNarnbWcrJs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
