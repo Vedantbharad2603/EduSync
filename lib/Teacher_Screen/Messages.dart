@@ -1,24 +1,23 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: file_names, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:edu_sync/Model/MessageModel.dart';
-import 'package:edu_sync/tools/helper.dart';
+import 'package:edu_sync/tools/Components.dart';
 import 'package:edu_sync/tools/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MessagesScreen extends StatefulWidget {
-  const MessagesScreen({Key? key}) : super(key: key);
+class Messages extends StatefulWidget {
+  const Messages({Key? key}) : super(key: key);
 
   @override
-  State<MessagesScreen> createState() => _MessagesScreenState();
+  State<Messages> createState() => _MessagesState();
 }
 
-class _MessagesScreenState extends State<MessagesScreen> {
+class _MessagesState extends State<Messages> {
+  final TextEditingController _messageController = TextEditingController();
   List<MessageModel> updates = [];
-  bool _shouldScrollToBottom = false;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -35,10 +34,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         currentDate.year != previousDate.year;
   }
 
-  void scrolldown() {
-    _shouldScrollToBottom = true;
-  }
-
   Future<void> _handleRefresh() async {
     // Simulate reloading data (replace this with your actual refresh logic)
     await Future.delayed(const Duration(seconds: 1));
@@ -47,25 +42,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
     });
   }
 
+  late int senderid;
   String username_d = "";
   String password_d = "";
   @override
   void initState() {
     super.initState();
-    super.initState();
     GetStorage storage = GetStorage();
     final mydata = storage.read('login_data');
+
     if (mydata != null) {
+      senderid = mydata['data']['userdata']['id'] ?? 0;
       username_d = mydata['data']['login']['username'] ?? "";
       password_d = mydata['data']['login']['password'] ?? "";
     }
+    // studentData.sort((a, b) => a['full_name'].compareTo(b['full_name']));
   }
 
   void sortMessagesByTimestamp() {
-    updates.sort((a, b) =>
-        DateTime.parse(a.datetime).compareTo(DateTime.parse(b.datetime)));
-
-    scrolldown();
+    updates.sort((a, b) => a.datetime.compareTo(b.datetime));
   }
 
   @override
@@ -73,17 +68,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return Scaffold(
       backgroundColor: MyTheme.mainbackground,
       appBar: AppBar(
-        backgroundColor: MyTheme.mainbuttontext,
+        backgroundColor: MyTheme.themeColor2,
         shadowColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded, color: MyTheme.textcolor),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        centerTitle: true,
         title: Text(
-          "Noticeboard",
+          "Updates",
           style: TextStyle(
             color: MyTheme.textcolor,
             fontSize: getSize(context, 2.7),
@@ -133,17 +121,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   }
 
                   sortMessagesByTimestamp();
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (_shouldScrollToBottom) {
-                      _scrollController.animateTo(
-                        _scrollController.position.maxScrollExtent,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOut,
-                      );
-                      _shouldScrollToBottom =
-                          false; // Reset the flag after scrolling
-                    }
-                  });
                   return ListView.builder(
                     controller: _scrollController,
                     itemCount: updates.length,
@@ -179,6 +156,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             message: updates[index].description,
                             dateTime: updates[index].datetime,
                             index: index,
+                            onDelete: _deleteMessage,
                           ),
                         ],
                       );
@@ -188,8 +166,168 @@ class _MessagesScreenState extends State<MessagesScreen> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: MyTheme
+                            .background, // Set your desired background color
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                            color: MyTheme.textcolor.withOpacity(0.6),
+                            width: 2)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: TextField(
+                        style:
+                            TextStyle(color: MyTheme.textcolor, fontSize: 18),
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Messages',
+                          hintStyle: TextStyle(
+                              color: MyTheme.textcolor.withOpacity(0.6),
+                              fontSize: 18),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          // border: OutlineInputBorder(
+                          //     borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    color: MyTheme.mainbutton,
+                  ),
+                  child: IconButton(
+                    onPressed: _addNewMessage,
+                    icon: const Icon(Icons.send),
+                    color: MyTheme.textcolor,
+                    padding: const EdgeInsets.all(8),
+                    splashRadius: 24,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  void _addNewMessage() async {
+    if (_messageController.text.isNotEmpty) {
+      DateTime now = DateTime.now();
+      String formattedDateTime =
+          DateFormat('yyyy-MM-dd HH:mm:ss.SSSSSS').format(now);
+
+      try {
+        await FirebaseFirestore.instance.collection('messages').add({
+          'timestamp': formattedDateTime,
+          'message': _messageController.text,
+        });
+
+        setState(() {
+          updates.add(
+            MessageModel(
+              datetime: formattedDateTime,
+              description: _messageController.text,
+            ),
+          );
+          _messageController.clear();
+          // Scroll to the bottom after adding a new message
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        });
+      } catch (e) {
+        // Handle the error, for example, show a snackbar with the error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to send message. Please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  void _deleteMessage(String messageId, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: MyTheme.background,
+          title: Text(
+            'Delete Message',
+            style: TextStyle(color: MyTheme.textcolor),
+          ),
+          content: Text(
+            'Are you sure you want to delete this message?',
+            style: TextStyle(color: MyTheme.textcolor),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor:
+                    WidgetStateProperty.all(MyTheme.button2.withOpacity(0.2)),
+                shadowColor: WidgetStateProperty.all(Colors.transparent),
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        15.0), // Adjust the value as needed
+                  ),
+                ),
+              ),
+              onPressed: () async {
+                await FirebaseFirestore.instance
+                    .collection('messages')
+                    .doc(messageId)
+                    .delete();
+                setState(() {
+                  updates.removeAt(index);
+                });
+                Navigator.of(context, rootNavigator: true).pop();
+                // WidgetsBinding.instance.addPostFrameCallback((_) {
+                //   Navigator.pop(context);
+                // });
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: MyTheme.button2),
+              ),
+            ),
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(
+                    MyTheme.mainbuttontext.withOpacity(0.2)),
+                shadowColor: WidgetStateProperty.all(Colors.transparent),
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        15.0), // Adjust the value as needed
+                  ),
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: MyTheme.mainbuttontext),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -200,13 +338,15 @@ class ChatBubble extends StatelessWidget {
   final String dateTime;
   final int index; // Add the index parameter
 
+  final Function(String, int) onDelete; // Update the type of onDelete
+
   const ChatBubble({
     Key? key,
     required this.messageId,
     required this.message,
     required this.dateTime,
     required this.index, // Include the index parameter in the constructor
-    // required this.onDelete,
+    required this.onDelete,
   }) : super(key: key);
 
   @override
@@ -215,6 +355,8 @@ class ChatBubble extends StatelessWidget {
     String formattedDateTime = DateFormat('hh:mm a').format(parsedDateTime);
 
     return GestureDetector(
+      onLongPress: () => onDelete(
+          messageId, index), // Pass the messageId and index to onDelete
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Align(
@@ -244,16 +386,9 @@ class ChatBubble extends StatelessWidget {
                         style: TextStyle(
                             color: MyTheme.textcolor,
                             fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                            fontWeight: FontWeight.w800),
                       ),
                     ),
-                    // IconButton(
-                    //   onPressed: onDelete,
-                    //   icon: Icon(
-                    //     Icons.delete,
-                    //     color: MyTheme.textcolor.withOpacity(0.7),
-                    //   ),
-                    // ),
                   ],
                 ),
                 const SizedBox(height: 4),

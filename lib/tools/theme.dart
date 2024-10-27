@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class MyTheme {
-
   static Color get mainbackground => _mainbackground();
   static Color get background => _background();
   static Color get background2 => _background2();
   static Color get textcolor => _textcolor();
   static Color get mainbutton => _mainbutton();
   static Color get mainbuttontext => _mainbuttontext();
+
+  static Color get themeColor => _themeColor();
+  static Color get themeColor2 => _themeColor2();
 
   static Color get button1 => _button1();
   static Color get button2 => _button2();
@@ -34,12 +36,20 @@ class MyTheme {
     return const Color(0xFF06ABAD);
   }
 
+  static Color _themeColor() {
+    return const Color(0xFF7DC2CC);
+  }
+
+  static Color _themeColor2() {
+    return const Color(0xFF06ABAD);
+  }
+
   static Color _textcolor() {
     return const Color.fromARGB(255, 11, 18, 34);
   }
 
   static Color _button1() {
-    return const Color.fromARGB(255, 94, 39, 213);
+    return const Color.fromARGB(255, 39, 213, 77);
   }
 
   static Color _button2() {
@@ -53,8 +63,6 @@ class MyTheme {
   static Color _highlightcolor() {
     return const Color.fromARGB(255, 220, 159, 148);
   }
-
-
 }
 
 

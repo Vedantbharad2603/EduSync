@@ -83,8 +83,14 @@ Widget BlackTag(context, Color? color, String? Line1, String? Line2,
                           Text(
                             Line2 ?? "Loading...",
                             overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                             style: tagStyle(Light2, 15, false),
                           ),
+                          // Text(
+                          //   ,
+                          //   overflow: TextOverflow.ellipsis,
+                          //   style: tagStyle(Light2, 15, false),
+                          // ),
                         ],
                       ),
                     ),
@@ -121,6 +127,7 @@ Widget BlackTag(context, Color? color, String? Line1, String? Line2,
                           Text(
                             Line2 ?? "Loading...",
                             overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                             style: tagStyle(Light2, 15, false),
                           ),
                         ],
@@ -128,10 +135,16 @@ Widget BlackTag(context, Color? color, String? Line1, String? Line2,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              500), // Clipping the image into a circle
-                          child: imageWidget),
+                      child: Container(
+                        height: 55,
+                        width: 55,
+                        clipBehavior: Clip.hardEdge,
+                        decoration: const BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(500))),
+                        child: imageWidget,
+                      ),
                     ),
                   ],
                 ),
@@ -178,8 +191,7 @@ Widget TapIcons(
                 width: iconSize,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(
-                        "assets/images/MainIcons/$iconFilename"), // replace with your asset path
+                    image: AssetImage("assets/images/MainIcons/$iconFilename"),
                     fit: BoxFit.contain,
                   ),
                 ),

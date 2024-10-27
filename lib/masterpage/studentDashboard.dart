@@ -50,7 +50,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
           List<EventModel> fetchedEvents =
               data.map((e) => EventModel.fromJson(e)).toList();
           setState(() {
-            events = fetchedEvents; // Update the events list
+            events = fetchedEvents;
           });
         } else {
           throw Exception('Data key not found in API response');
@@ -131,7 +131,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
               context,
               Dark1,
               full_name_d,
-              coursename,
+              "Student",
               Icon(Icons.person),
               // CachedNetworkImage(
               //   imageUrl: studentImageAPI(userData.studentDetails!.grNo),
@@ -174,9 +174,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     TapIcons(context, "Noticeboard", 2, "noticeboard.png", 45,
                         "/stMessages", null),
                     TapIcons(context, "Holidays", 2, "holiday.png", 45,
-                        "/placement", null),
+                        "/updateTimetable", null),
                     TapIcons(context, "Timetable", 2, "timetable.png", 45,
-                        "/placement", null),
+                        "/updateTimetable", null),
+                    TapIcons(context, "Events", 2, "event.png", 80,
+                        "/showEvents", null),
                   ],
                 ),
               ),
@@ -186,13 +188,15 @@ class _StudentDashboardState extends State<StudentDashboard> {
               context,
               Dark1,
               "Upcoming Event",
-              "Engineer's Day Celebration",
+              events.isNotEmpty && events[0].event_description != null
+                  ? events[0].event_description
+                  : "No upcoming event",
               Image.asset(
                 "assets/images/arrow_right.png",
                 fit: BoxFit.cover,
               ),
               false,
-            ),
+            )
           ],
         ),
       ),

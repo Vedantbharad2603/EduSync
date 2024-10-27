@@ -1,6 +1,13 @@
 import 'package:edu_sync/Student_Screen/AttendancePage.dart';
 import 'package:edu_sync/Start_Page/Mynavigator.dart';
 import 'package:edu_sync/Student_Screen/st_messages.dart';
+import 'package:edu_sync/Student_Screen/st_show_events.dart';
+import 'package:edu_sync/Teacher_Screen/AddEvent.dart';
+import 'package:edu_sync/Teacher_Screen/Attendance.dart';
+import 'package:edu_sync/Teacher_Screen/ListofHolidays.dart';
+import 'package:edu_sync/Teacher_Screen/ManageTeacher.dart';
+import 'package:edu_sync/Teacher_Screen/Messages.dart';
+import 'package:edu_sync/Teacher_Screen/UpdateTimetablePage.dart';
 import 'package:edu_sync/tools/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:edu_sync/Start_Page/SplashScreen.dart';
@@ -60,6 +67,10 @@ class MyApp extends StatelessWidget {
             transition: Transition.fadeIn,
             page: () => const Mynavigator()),
         GetPage(
+            name: "/teacherattendance",
+            transition: Transition.fadeIn,
+            page: () => const Attendance()),
+        GetPage(
           name: "/attendancepage",
           transition: Transition.fadeIn,
           page: () {
@@ -71,6 +82,30 @@ class MyApp extends StatelessWidget {
             name: "/stMessages",
             transition: Transition.fadeIn,
             page: () => const MessagesScreen()),
+        GetPage(
+            name: "/teacherHolidays",
+            transition: Transition.fadeIn,
+            page: () => const ListofHolidays()),
+        GetPage(
+            name: "/updateTimetable",
+            transition: Transition.fadeIn,
+            page: () => UpdateTimetablePage()),
+        GetPage(
+            name: "/manageTeacher",
+            transition: Transition.fadeIn,
+            page: () => const ManageTeacher()),
+        GetPage(
+            name: "/addEventPage",
+            transition: Transition.fadeIn,
+            page: () => const AddEventPage()),
+        GetPage(
+            name: "/messages",
+            transition: Transition.fadeIn,
+            page: () => const Messages()),
+        GetPage(
+            name: "/showEvents",
+            transition: Transition.fadeIn,
+            page: () => const StShowEvents()),
       ],
       initialRoute: "/splashscreen",
     );

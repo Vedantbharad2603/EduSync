@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                               bottomLeft: Radius.elliptical(20, 20),
                               bottomRight: Radius.elliptical(20, 20),
                             ),
-                            color: MyTheme.mainbuttontext,
+                            color: MyTheme.textcolor,
                           ),
                           child: Padding(
                             padding: EdgeInsets.only(
@@ -189,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                                       style: TextStyle(
                                         fontSize: getSize(context, 3),
                                         fontWeight: FontWeight.bold,
-                                        color: MyTheme.textcolor,
+                                        color: MyTheme.background,
                                       ),
                                     ),
                                   ),
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                                       overflow: TextOverflow.fade,
                                       style: TextStyle(
                                         fontSize: getSize(context, 1.8),
-                                        color: MyTheme.textcolor,
+                                        color: MyTheme.background,
                                       ),
                                     ),
                                   ),
@@ -307,7 +307,7 @@ class _LoginPageState extends State<LoginPage> {
                                     icon: Icon(_isPasswordHidden
                                         ? Icons.visibility_off
                                         : Icons.visibility),
-                                    color: MyTheme.mainbuttontext,
+                                    color: MyTheme.textcolor,
                                     onPressed: () {
                                       setState(() {
                                         _isPasswordHidden = !_isPasswordHidden;
@@ -326,7 +326,7 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Text(
                                     'Login using OTP',
                                     style: TextStyle(
-                                        color: MyTheme.mainbuttontext,
+                                        color: MyTheme.textcolor,
                                         fontSize: getSize(context, 1.9)),
                                   ),
                                 ),
@@ -343,14 +343,14 @@ class _LoginPageState extends State<LoginPage> {
                                   width: double.infinity,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: MyTheme.mainbutton,
+                                    color: MyTheme.textcolor.withOpacity(0.8),
                                     borderRadius: BorderRadius.circular(
                                         getSize(context, 2.5)),
                                   ),
                                   child: Text(
                                     'Continue',
                                     style: TextStyle(
-                                      color: MyTheme.textcolor,
+                                      color: MyTheme.background,
                                       fontWeight: FontWeight.w600,
                                       fontSize: getSize(context, 2.8),
                                     ),
@@ -371,7 +371,7 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.black.withOpacity(0.5),
                 child: Center(
                   child: CircularProgressIndicator(
-                    color: MyTheme.mainbuttontext,
+                    color: MyTheme.textcolor,
                   ),
                 ),
               ),

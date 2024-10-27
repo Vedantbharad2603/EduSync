@@ -4,6 +4,7 @@ import 'package:edu_sync/Model/EventModel.dart';
 import 'package:edu_sync/tools/Colors.dart';
 import 'package:edu_sync/tools/Components.dart';
 import 'package:edu_sync/tools/apiconst.dart';
+import 'package:edu_sync/tools/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -46,7 +47,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
   String password_d = "";
   String holidayName = "";
   String holidayDate = "";
-  String coursename = "";
   bool _isLoading = false;
   List<EventModel> events = [];
 
@@ -148,7 +148,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
       full_name_d = mydata['data']['userdata']['full_name'] ?? "";
       username_d = mydata['data']['login']['username'] ?? "";
       password_d = mydata['data']['login']['password'] ?? "";
-      coursename = mydata['data']['courseinfo']['course_name'] ?? "";
     }
 
     fetchEvents();
@@ -169,13 +168,13 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
       //   },
       //   child: Icon(Icons.exit_to_app),
       // ),
-      backgroundColor: Colors.white,
+      backgroundColor: MyTheme.background,
       appBar: AppBar(
         title: Text("Dashboard",
             style: TextStyle(
                 color: Colors.black, fontFamily: "mu_reg", fontSize: 23)),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: MyTheme.background,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -185,7 +184,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
               context,
               Dark1,
               full_name_d,
-              coursename,
+              "Teacher",
               Icon(Icons.person),
               // CachedNetworkImage(
               //   imageUrl: studentImageAPI(userData.studentDetails!.grNo),
@@ -201,17 +200,17 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
               //   ),
               //   fit: BoxFit.cover,
               // ),
-              true,
+              false,
             ),
             SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.all(20),
               child: Container(
-                height: 400,
+                height: 280,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 child: GridView.count(
                   shrinkWrap:
@@ -223,23 +222,17 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                   padding: EdgeInsets.all(10),
                   children: [
                     TapIcons(context, "Attendance", 2, "attendance.png", 45,
-                        "/attendance", null),
-                    TapIcons(context, "Placement", 2, "placement.png", 45,
-                        "/placement", null),
-                    TapIcons(context, "Leaves", 2, "leaves.png", 45,
-                        "/placement", null),
-                    TapIcons(context, "Result", 2, "result.png", 45,
-                        "/placement", null),
-                    TapIcons(context, "Exams", 2, "exam.png", 45, "/placement",
-                        null),
-                    TapIcons(context, "Holidays", 2, "holiday.png", 45,
-                        "/placement", null),
+                        "/teacherattendance", null),
+                    TapIcons(context, "Manage Holidays", 2, "holiday.png", 45,
+                        "/teacherHolidays", null),
                     TapIcons(context, "Timetable", 2, "timetable.png", 45,
-                        "/placement", null),
+                        "/updateTimetable", null),
                     TapIcons(context, "Faculties", 2, "faculty.png", 45,
-                        "/placement", null),
+                        "/manageTeacher", null),
                     TapIcons(context, "Noticeboard", 2, "noticeboard.png", 45,
-                        "/placement", null),
+                        "/messages", null),
+                    TapIcons(context, "Events", 2, "event.png", 80,
+                        "/addEventPage", null),
                   ],
                 ),
               ),
@@ -254,7 +247,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                 "assets/images/arrow_right.png",
                 fit: BoxFit.cover,
               ),
-              false,
+              true,
             ),
           ],
         ),
