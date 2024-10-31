@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:edu_sync/Model/EventModel.dart';
+import 'package:edu_sync/Model/SlotModel.dart';
 import 'package:edu_sync/tools/Colors.dart';
 import 'package:edu_sync/tools/Components.dart';
 import 'package:edu_sync/tools/apiconst.dart';
@@ -13,8 +14,9 @@ import 'package:get/utils.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
-// import '../API/API.dart';
-// import '../Model/UserDataModel.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:permission_handler/permission_handler.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -25,8 +27,6 @@ class StudentDashboard extends StatefulWidget {
 
 class _StudentDashboardState extends State<StudentDashboard> {
   final box = GetStorage();
-  // late UserData userData;
-
   late int studentid;
   String full_name_d = "";
   String username_d = "";
@@ -36,6 +36,15 @@ class _StudentDashboardState extends State<StudentDashboard> {
   String coursename = "";
   bool _isLoading = false;
   List<EventModel> events = [];
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  Map<String, List<SlotModel>> timetable = {
+    'Monday': [],
+    'Tuesday': [],
+    'Wednesday': [],
+    'Thursday': [],
+    'Friday': []
+  };
 
   Future<void> fetchEvents() async {
     setState(() {
@@ -94,10 +103,125 @@ class _StudentDashboardState extends State<StudentDashboard> {
     }
   }
 
+  Future<void> fetchTimetableData() async {
+    try {
+      final response = await http.get(Uri.parse(Apiconst.getTimeTable));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        List<dynamic> data = responseData['data'];
+
+        // Clear old notifications
+        await flutterLocalNotificationsPlugin.cancelAll();
+
+        setState(() {
+          timetable = {
+            'Monday': [],
+            'Tuesday': [],
+            'Wednesday': [],
+            'Thursday': [],
+            'Friday': []
+          };
+
+          for (var item in data) {
+            String day = item['day'];
+            if (timetable.containsKey(day)) {
+              TimeOfDay startTime = TimeOfDay(
+                hour: int.parse(item['start_time'].split(":")[0]),
+                minute: int.parse(item['start_time'].split(":")[1]),
+              );
+
+              timetable[day]!.add(SlotModel(
+                id: item['id'],
+                day: day,
+                startTime: startTime,
+                endTime: TimeOfDay(
+                  hour: int.parse(item['end_time'].split(":")[0]),
+                  minute: int.parse(item['end_time'].split(":")[1]),
+                ),
+                subject: item['subject'],
+                className: item['class_name'],
+                slotNumber: item['slot_number'],
+              ));
+
+              // Schedule notification
+              scheduleNotification(item);
+            }
+          }
+          box.write('timetable', timetable);
+        });
+      } else {
+        throw Exception('Failed to load timetable');
+      }
+    } catch (e) {
+      print('Error fetching timetable: $e');
+    }
+  }
+
+  Future<void> scheduleNotification(Map<String, dynamic> item) async {
+    final TimeOfDay startTime = TimeOfDay(
+      hour: int.parse(item['start_time'].split(":")[0]),
+      minute: int.parse(item['start_time'].split(":")[1]),
+    );
+
+    final DateTime now = DateTime.now();
+    DateTime notificationTime = DateTime(
+        now.year, now.month, now.day, startTime.hour, startTime.minute);
+
+    if (notificationTime.isBefore(now)) {
+      notificationTime = notificationTime.add(Duration(days: 1));
+    }
+
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        item['id'],
+        'Class Reminder',
+        'Your class ${item['subject']} starts at ${item['start_time']}',
+        tz.TZDateTime.from(notificationTime, tz.local),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'your_channel_id',
+            'your_channel_name',
+            channelDescription: 'Your channel description',
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+      print(
+          "Notification scheduled for ${item['subject']} at ${item['start_time']}.");
+    } catch (e) {
+      print(
+          "Failed to schedule notification for ${item['subject']} at ${item['start_time']}. Error: $e");
+    }
+  }
+
+  Future<void> requestNotificationPermission() async {
+    var status = await Permission.notification.status;
+    if (status.isDenied) {
+      status = await Permission.notification.request();
+      if (status.isGranted) {
+        print("Notification permission granted.");
+      } else {
+        print("Notification permission denied.");
+      }
+    } else {
+      print("Notification permission already granted.");
+    }
+
+    if (await Permission.ignoreBatteryOptimizations.isDenied) {
+      await Permission.ignoreBatteryOptimizations.request();
+      print("Requested ignore battery optimizations permission.");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    super.initState();
+    requestNotificationPermission();
     GetStorage storage = GetStorage();
     final mydata = storage.read('login_data');
     if (mydata != null) {
@@ -110,6 +234,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
     fetchEvents();
     fetchHoliday();
+    fetchTimetableData();
   }
 
   @override
@@ -133,25 +258,19 @@ class _StudentDashboardState extends State<StudentDashboard> {
               full_name_d,
               "Student",
               Icon(Icons.person),
-              // CachedNetworkImage(
-              //   imageUrl: studentImageAPI(userData.studentDetails!.grNo),
-              //   placeholder: (context, url) => Icon(
-              //     Icons.person,
-              //     size: 50,
-              //     color: Colors.black45,
-              //   ),
-              //   errorWidget: (context, url, error) => Icon(
-              //     Icons.person,
-              //     size: 50,
-              //     color: Colors.black87,
-              //   ),
-              //   fit: BoxFit.cover,
-              // ),
+              IconButton(
+                icon: Icon(Icons.logout, color: Colors.white),
+                onPressed: () async {
+                  final storage = GetStorage();
+                  await storage.remove('login_data');
+                  await storage.write('logedin', false);
+                  Get.offAllNamed("/login");
+                },
+              ),
               true,
             ),
             SizedBox(height: 20),
             Padding(
-              // padding: const EdgeInsets.symmetric(horizontal: 5),
               padding: const EdgeInsets.all(20),
               child: Container(
                 height: 280,
@@ -161,8 +280,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: GridView.count(
-                  shrinkWrap:
-                      true, // Ensures the GridView takes only as much space as it needs
+                  shrinkWrap: true,
                   crossAxisCount: 3,
                   mainAxisSpacing: 0,
                   crossAxisSpacing: 10,
@@ -174,9 +292,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     TapIcons(context, "Noticeboard", 2, "noticeboard.png", 45,
                         "/stMessages", null),
                     TapIcons(context, "Holidays", 2, "holiday.png", 45,
-                        "/updateTimetable", null),
+                        "/stHolidays", null),
                     TapIcons(context, "Timetable", 2, "timetable.png", 45,
-                        "/updateTimetable", null),
+                        "/stTimeTable", null),
                     TapIcons(context, "Events", 2, "event.png", 80,
                         "/showEvents", null),
                   ],
@@ -191,12 +309,18 @@ class _StudentDashboardState extends State<StudentDashboard> {
               events.isNotEmpty && events[0].event_description != null
                   ? events[0].event_description
                   : "No upcoming event",
-              Image.asset(
-                "assets/images/arrow_right.png",
-                fit: BoxFit.cover,
+              IconButton(
+                icon: Image.asset(
+                  "assets/images/arrow_right.png",
+                  fit: BoxFit.cover,
+                ),
+                onPressed: () async {
+                  Get.toNamed("/showEvents");
+                },
               ),
+              SizedBox(),
               false,
-            )
+            ),
           ],
         ),
       ),

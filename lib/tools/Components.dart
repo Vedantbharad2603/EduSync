@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import 'Style.dart';
 
@@ -23,7 +24,7 @@ double getSize(context, double i) {
 }
 
 Widget BlackTag(context, Color? color, String? Line1, String? Line2,
-    Widget? imageWidget, bool isReverse) {
+    Widget? imageWidget, Widget? logout, bool isReverse) {
   return Container(
     alignment: Alignment.centerRight,
     child: Row(
@@ -40,6 +41,7 @@ Widget BlackTag(context, Color? color, String? Line1, String? Line2,
                     right: Radius.circular(500),
                   ),
                 ),
+                child: logout,
               ),
               Container(
                 height: 65,
@@ -158,6 +160,7 @@ Widget BlackTag(context, Color? color, String? Line1, String? Line2,
                     left: Radius.circular(500),
                   ),
                 ),
+                child: logout,
               ),
             ],
     ),

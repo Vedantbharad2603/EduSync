@@ -186,20 +186,15 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
               full_name_d,
               "Teacher",
               Icon(Icons.person),
-              // CachedNetworkImage(
-              //   imageUrl: studentImageAPI(userData.studentDetails!.grNo),
-              //   placeholder: (context, url) => Icon(
-              //     Icons.person,
-              //     size: 50,
-              //     color: Colors.black45,
-              //   ),
-              //   errorWidget: (context, url, error) => Icon(
-              //     Icons.person,
-              //     size: 50,
-              //     color: Colors.black87,
-              //   ),
-              //   fit: BoxFit.cover,
-              // ),
+              IconButton(
+                icon: Icon(Icons.logout, color: Colors.white),
+                onPressed: () async {
+                  final storage = GetStorage();
+                  await storage.remove('login_data');
+                  await storage.write('logedin', false);
+                  Get.offAllNamed("/login");
+                },
+              ),
               false,
             ),
             SizedBox(height: 20),
@@ -242,11 +237,19 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
               context,
               Dark1,
               "Upcoming Event",
-              "Engineer's Day Celebration",
-              Image.asset(
-                "assets/images/arrow_right.png",
-                fit: BoxFit.cover,
+              events.isNotEmpty && events[0].event_description != null
+                  ? events[0].event_description
+                  : "No upcoming event",
+              IconButton(
+                icon: Image.asset(
+                  "assets/images/arrow_right.png",
+                  fit: BoxFit.cover,
+                ),
+                onPressed: () async {
+                  Get.toNamed("/addEventPage");
+                },
               ),
+              SizedBox(),
               true,
             ),
           ],

@@ -1,7 +1,9 @@
 import 'package:edu_sync/Student_Screen/AttendancePage.dart';
 import 'package:edu_sync/Start_Page/Mynavigator.dart';
+import 'package:edu_sync/Student_Screen/st_Holidays.dart';
 import 'package:edu_sync/Student_Screen/st_messages.dart';
 import 'package:edu_sync/Student_Screen/st_show_events.dart';
+import 'package:edu_sync/Student_Screen/st_timetable.dart';
 import 'package:edu_sync/Teacher_Screen/AddEvent.dart';
 import 'package:edu_sync/Teacher_Screen/Attendance.dart';
 import 'package:edu_sync/Teacher_Screen/ListofHolidays.dart';
@@ -22,16 +24,55 @@ import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Set portrait orientation
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  // Initialize GetStorage and TimeZone
   await GetStorage.init();
+  tz.initializeTimeZones();
+
+  // Initialize notification settings
+  const AndroidInitializationSettings androidSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const DarwinInitializationSettings iosSettings =
+      DarwinInitializationSettings();
+  const InitializationSettings initSettings =
+      InitializationSettings(android: androidSettings, iOS: iosSettings);
+
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  // Request notification permissions
+  await requestNotificationPermissions();
+
   runApp(MyApp());
+}
+
+// Request notification and ignore battery optimizations permissions
+Future<void> requestNotificationPermissions() async {
+  if (await Permission.notification.isDenied) {
+    await Permission.notification.request();
+  }
+
+  if (await Permission.ignoreBatteryOptimizations.isDenied) {
+    await Permission.ignoreBatteryOptimizations.request();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -106,6 +147,14 @@ class MyApp extends StatelessWidget {
             name: "/showEvents",
             transition: Transition.fadeIn,
             page: () => const StShowEvents()),
+        GetPage(
+            name: "/stTimeTable",
+            transition: Transition.fadeIn,
+            page: () => const StTimeTable()),
+        GetPage(
+            name: "/stHolidays",
+            transition: Transition.fadeIn,
+            page: () => const StHolidays()),
       ],
       initialRoute: "/splashscreen",
     );

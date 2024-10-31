@@ -1,31 +1,10 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 import 'dart:convert';
+import 'package:edu_sync/Model/HolidayModel.dart';
 import 'package:edu_sync/tools/apiconst.dart';
 import 'package:edu_sync/tools/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-class HolidayData {
-  late int id;
-  final String name;
-  final String date;
-  bool consider;
-
-  HolidayData({
-    this.id = 0,
-    required this.name,
-    required this.date,
-    this.consider = true, // Default value is true
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'date': date,
-      'consider': consider,
-    };
-  }
-}
 
 class ListofHolidays extends StatefulWidget {
   const ListofHolidays({super.key});
@@ -35,12 +14,12 @@ class ListofHolidays extends StatefulWidget {
 }
 
 class _ListofHolidaysState extends State<ListofHolidays> {
-  List<HolidayData> holidayDataList = []; // Store fetched holiday data
+  List<HolidayModel> holidayDataList = []; // Store fetched holiday data
   bool _isLoading = false;
   // List<bool> selected = []; // Track selected holidays
   // List<bool> selected = List.generate(holidayDataList.length, (index) => false);
 
-  late Future<List<HolidayData>> _futureHolidays = Future.value([]);
+  late Future<List<HolidayModel>> _futureHolidays = Future.value([]);
 
   @override
   void initState() {
@@ -61,7 +40,7 @@ class _ListofHolidaysState extends State<ListofHolidays> {
       Map<String, dynamic> data = json.decode(response.body);
       List<dynamic> fetchedHolidays = data['response']['holidays'];
       holidayDataList = fetchedHolidays
-          .map((holiday) => HolidayData(
+          .map((holiday) => HolidayModel(
                 name: holiday['name'],
                 date: holiday['date']['iso'],
               ))
@@ -75,7 +54,7 @@ class _ListofHolidaysState extends State<ListofHolidays> {
     }
   }
 
-  void addholiday(List<HolidayData> holidayDataList) async {
+  void addholiday(List<HolidayModel> holidayDataList) async {
     for (var holiday in holidayDataList) {
       Map<String, dynamic> body = {
         "holiday_name": holiday.name,
@@ -102,8 +81,8 @@ class _ListofHolidaysState extends State<ListofHolidays> {
     }
   }
 
-  Future<List<HolidayData>> getholiday() async {
-    List<HolidayData> holidayDataList = [];
+  Future<List<HolidayModel>> getholiday() async {
+    List<HolidayModel> holidayDataList = [];
 
     try {
       http.Response response = await http.get(
@@ -117,10 +96,10 @@ class _ListofHolidaysState extends State<ListofHolidays> {
         List<dynamic> holidays =
             data['data']; // Assuming 'holidays' is the key for the list
 
-        // Map the list of holidays to HolidayData objects
+        // Map the list of holidays to HolidayModel objects
         // print(data['data'][1]['is_holiday']);
         holidayDataList = holidays.map((holiday) {
-          return HolidayData(
+          return HolidayModel(
             id: holiday['id'],
             name: holiday['holiday_name'],
             date: holiday['holiday_date'],
@@ -221,7 +200,7 @@ class _ListofHolidaysState extends State<ListofHolidays> {
               title: Text('Manage Holidays',
                   style: TextStyle(color: MyTheme.textcolor)),
             ),
-            body: FutureBuilder<List<HolidayData>>(
+            body: FutureBuilder<List<HolidayModel>>(
               future: _futureHolidays,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -242,7 +221,7 @@ class _ListofHolidaysState extends State<ListofHolidays> {
                     style: TextStyle(color: Colors.white),
                   ));
                 } else {
-                  List<HolidayData> fetchedHolidays = snapshot.data!;
+                  List<HolidayModel> fetchedHolidays = snapshot.data!;
                   holidayDataList =
                       fetchedHolidays; // Assign fetchedHolidays to holidayDataList
                   return ListView.builder(

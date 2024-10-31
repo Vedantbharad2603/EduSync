@@ -317,21 +317,21 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               SizedBox(height: getHeight(context, 0.02)),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: InkWell(
-                                  onTap: () {
-                                    Get.offAllNamed("/loginOTP");
-                                  },
-                                  child: Text(
-                                    'Login using OTP',
-                                    style: TextStyle(
-                                        color: MyTheme.textcolor,
-                                        fontSize: getSize(context, 1.9)),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: getHeight(context, 0.025)),
+                              // Align(
+                              //   alignment: Alignment.centerRight,
+                              //   child: InkWell(
+                              //     onTap: () {
+                              //       Get.offAllNamed("/loginOTP");
+                              //     },
+                              //     child: Text(
+                              //       'Login using OTP',
+                              //       style: TextStyle(
+                              //           color: MyTheme.textcolor,
+                              //           fontSize: getSize(context, 1.9)),
+                              //     ),
+                              //   ),
+                              // ),
+                              // SizedBox(height: getHeight(context, 0.025)),
                               InkWell(
                                 onTap: () {
                                   String username = _usernameController.text;

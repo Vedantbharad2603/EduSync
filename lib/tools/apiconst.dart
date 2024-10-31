@@ -1,6 +1,6 @@
 class Apiconst {
   static String get baseurl =>
-      "https://44c2-103-107-61-110.ngrok-free.app/api/";
+      "https://7e37-103-107-61-110.ngrok-free.app/api/";
   // "https://smart-classmate-server.onrender.com/api/";
   //live api baseurl "https://smart-classmate-server.onrender.com/"
   //Emulator baseurl "http://10.0.2.2:3000/"
